@@ -1,0 +1,25 @@
+# 9 
+SELECT COUNT(DISTINCT rozklady.NR_PRZEDM) as "Ilość przedmiotów Janeczka" 
+FROM pracownicy
+INNER JOIN rozklady ON rozklady.NR_PRAC = pracownicy.NR_PRAC
+WHERE pracownicy.NAZWISKO = "JANECZEK";
+
+# 10
+SELECT max(pracownicy.DATA_UR) as "Data urodzenia najmłodszego" 
+FROM pracownicy
+INNER JOIN przedmioty ON przedmioty.NR_ODP_PRAC = pracownicy.NR_PRAC;
+
+# 11
+SELECT max(sale.ROZM_SALI) as "Najwieksza sala" FROM sale
+INNER JOIN rozklady ON rozklady.NR_SALI = sale.NR_SALI
+WHERE rozklady.DZIEN = "PON" AND rozklady.GODZINA BETWEEN 12 AND 16
+
+# 12
+SELECT rozklady.NR_SALI ,COUNT( DISTINCT rozklady.NR_PRZEDM)
+as "Ile przedmiotów w tej sali" FROM rozklady
+GROUP BY rozklady.NR_SALI
+
+# 13
+SELECT round(avg(oceny.OCENA), 2) as "Średnie oceny" , przedmioty.NAZWA_PRZEDM FROM oceny
+INNER JOIN przedmioty ON oceny.NR_PRZEDM = przedmioty.NR_PRZEDM
+GROUP BY przedmioty.NR_PRZEDM
