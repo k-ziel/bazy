@@ -1,25 +1,75 @@
 # 9 
+# Podac z ilu róznych przedmiotów prowadzi zajecia pracownik JANECZEK. 
 SELECT COUNT(DISTINCT rozklady.NR_PRZEDM) as "Ilość przedmiotów Janeczka" 
 FROM pracownicy
 INNER JOIN rozklady ON rozklady.NR_PRAC = pracownicy.NR_PRAC
 WHERE pracownicy.NAZWISKO = "JANECZEK";
 
 # 10
+# Podac date urodzenia najmlodszego pracownika odpowiadającego za prowadzenie
+przedmiotu. 
 SELECT max(pracownicy.DATA_UR) as "Data urodzenia najmłodszego" 
 FROM pracownicy
 INNER JOIN przedmioty ON przedmioty.NR_ODP_PRAC = pracownicy.NR_PRAC;
 
 # 11
+# Podac rozmiar najwiekszej sali, w której odbywają sie zajecia w poniedzialek miedzy
+godz. 12:00 a 16:00. 
 SELECT max(sale.ROZM_SALI) as "Najwieksza sala" FROM sale
 INNER JOIN rozklady ON rozklady.NR_SALI = sale.NR_SALI
 WHERE rozklady.DZIEN = "PON" AND rozklady.GODZINA BETWEEN 12 AND 16
 
 # 12
+# Podac liczbe przedmiotów prowadzonych w poszczególnych salach.
 SELECT rozklady.NR_SALI ,COUNT( DISTINCT rozklady.NR_PRZEDM)
 as "Ile przedmiotów w tej sali" FROM rozklady
 GROUP BY rozklady.NR_SALI
 
 # 13
+# Dla kazdego przedmiotu podac srednią ocen
 SELECT round(avg(oceny.OCENA), 2) as "Średnie oceny" , przedmioty.NAZWA_PRZEDM FROM oceny
 INNER JOIN przedmioty ON oceny.NR_PRZEDM = przedmioty.NR_PRZEDM
 GROUP BY przedmioty.NR_PRZEDM
+
+# 14
+# Podac liczbe zajec realizowanych przez kazdego odpowiedzialnego za przedmiot
+pracownika. 
+SELECT pracownicy.NAZWISKO, count(rozklady.NR_PRAC) as "Ilość zajęć"
+FROM pracownicy
+INNER JOIN przedmioty on pracownicy.NR_PRAC = przedmioty.NR_ODP_PRAC
+INNER JOIN rozklady on rozklady.NR_PRAC = pracownicy.NR_PRAC
+GROUP BY pracownicy.NR_PRAC
+
+# 15
+# Podac nazwy przedmiotów i ilosc pracowników biorących w nich udział
+SELECT przedmioty.NAZWA_PRZEDM, count( DISTINCT rozklady.NR_PRAC)
+FROM przedmioty INNER JOIN rozklady
+ON rozklady.NR_PRZEDM = przedmioty.NR_PRZEDM
+GROUP BY przedmioty.NR_PRZEDM
+
+# 15.1
+# Podac nazwy przedmiotów i ilosc pracowników biorących w nich udział, i gdzie jest więcej niż 2 pracownikow
+SELECT przedmioty.NAZWA_PRZEDM, count( DISTINCT rozklady.NR_PRAC)
+FROM przedmioty INNER JOIN rozklady
+ON rozklady.NR_PRZEDM = przedmioty.NR_PRZEDM
+GROUP BY przedmioty.NR_PRZEDM
+HAVING count(DISTINCT rozklady.NR_PRAC) > 2
+
+# 16
+# Podac nazwiska pracowników mających wiecej niz jedne zajecia w PON.
+SELECT pracownicy.NAZWISKO, COUNT(rozklady.DZIEN) as "Ile"
+FROM pracownicy
+INNER JOIN rozklady on pracownicy.NR_PRAC = rozklady.NR_PRAC
+where rozklady.DZIEN = "PON"
+GROUP by pracownicy.NR_PRAC
+HAVING COUNT(rozklady.DZIEN) >1
+
+# 67
+# nwm jakie polecenie
+SELECT przedmioty.NAZWA_PRZEDM, count(DISTINCT rozklady.NR_SALI)
+from przedmioty 
+INNER JOIN rozklady on rozklady.NR_PRZEDM = przedmioty.NR_PRZEDM
+WHERE rozklady.DZIEN in("PON", "SRO")
+GROUP by przedmioty.NR_PRZEDM
+HAVING COUNT(DISTINCT rozklady.NR_SALI)>1
+ORDER by przedmioty.NAZWA_PRZEDM ASC
