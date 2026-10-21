@@ -73,3 +73,30 @@ WHERE rozklady.DZIEN in("PON", "SRO")
 GROUP by przedmioty.NR_PRZEDM
 HAVING COUNT(DISTINCT rozklady.NR_SALI)>1
 ORDER by przedmioty.NAZWA_PRZEDM ASC
+
+
+# 18
+SELECT przedmioty.NAZWA_PRZEDM FROM przedmioty
+INNER JOIN pracownicy ON przedmioty.NR_ODP_PRAC = pracownicy.NR_PRAC
+WHERE pracownicy.DATA_UR > (SELECT pracownicy.DATA_UR FROM pracownicy WHERE pracownicy.NAZWISKO = "Janeczek");
+
+# 19
+SELECT pracownicy.NAZWISKO, round(AVG(wyplaty.KWOTA)) FROM pracownicy
+INNER JOIN wyplaty ON wyplaty.NR_PRAC = pracownicy.NR_PRAC
+GROUP BY pracownicy.NR_PRAC
+
+HAVING AVG(round(wyplaty.KWOTA)) < (SELECT round(AVG(round(wyplaty.KWOTA))) FROM wyplaty
+INNER JOIN pracownicy ON pracownicy.NR_PRAC = wyplaty.NR_PRAC
+WHERE pracownicy.NAZWISKO = "Misiura");
+
+
+# 20
+SELECT przedmioty.NAZWA_PRZEDM, COUNT(DISTINCT pracownicy.NR_ZESP) FROM przedmioty
+INNER JOIN rozklady ON przedmioty.NR_PRZEDM = rozklady.NR_PRZEDM
+INNER JOIN pracownicy ON rozklady.NR_PRAC = pracownicy.NR_PRAC
+GROUP BY przedmioty.NR_PRZEDM
+
+HAVING COUNT(DISTINCT pracownicy.NR_ZESP) > (SELECT COUNT(DISTINCT pracownicy.NR_ZESP) FROM przedmioty
+INNER JOIN rozklady ON przedmioty.NR_PRZEDM = rozklady.NR_PRZEDM
+INNER JOIN pracownicy ON pracownicy.NR_PRAC = rozklady.NR_PRAC
+WHERE przedmioty.NAZWA_PRZEDM = "Algebra");
